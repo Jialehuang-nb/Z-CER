@@ -434,6 +434,8 @@ def writeresult(pred,name):
             if video == n:
                 video = video + str(label_map[pred])+'\n'
             result.append(video)
+        f.closeclose()
+        f = open("CVPR_6th_ABAW_CE_test_set_sample.txt",'r+')
         f.writelines(result)
         f.close()
                
