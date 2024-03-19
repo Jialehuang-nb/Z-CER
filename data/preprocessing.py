@@ -7,6 +7,7 @@ import numpy as np
 video_root="C:/Users/67455/Desktop/abaw-test/videos/"
 image_root="C:/Users/67455/Desktop/abaw-test/images_raw/"
 save_root="C:/Users/67455/Desktop/abaw-test/images_aligned/"
+p = ["05","16","24","28","29","33","40","43","44","51","56"]
 def apart(video_path, video_name):
     video = os.path.join(video_path, video_name)
     image_path = os.path.join(image_root, video_name[:-4])
@@ -16,9 +17,9 @@ def apart(video_path, video_name):
         os.makedirs(image_path)
     use_video = cv2.VideoCapture(video)
     count = 0
-
     print('Start extracting images!')
     while True:
+        temp = image
         res, image = use_video.read()
         count += 1
 
@@ -29,7 +30,9 @@ def apart(video_path, video_name):
         image_name = os.path.join(image_path,str(count))
         cv2.imwrite(image_name+ '.jpg', image)
         print(image_path + str(count) + '.jpg')
-
+    if video_name in p:
+        image_name = os.path.join(image_path,str(count))
+        cv2.imwrite(image_name+ '.jpg', temp)
     print('End of image extraction!')
     use_video.release()
 
