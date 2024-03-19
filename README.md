@@ -4,9 +4,9 @@ This github repository holds the code for the USTC-AC team to participate in the
 # start
 `pip install -r requirements.txt`
 
-#train
+# train
 `python vote.py`
 
-#predict
+# predict
 `python predict.py`
 
