@@ -1,29 +1,5 @@
 # abaw-ce-ustc
+This github repository holds the code for the USTC-AC team to participate in the 6th ABAW competition.
 
-data
-
- -images_aligned 
- 
- -images_raw
- 
- -videos
- 
- -preprocessing.pu
-
-train
-
- -0
- 
-  ...
-
-test
-
-  -0
-  
-  ...
-
-vote_model_state\20240313BalCE_Dice
-
-  -model0.pth
-  
-  ...
+# start
+`pip install -r req.txt`
