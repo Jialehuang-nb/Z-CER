@@ -240,51 +240,18 @@ def plot_matrix(y_true, y_pred, labels_name, save_dir, title=None, thresh=0.8, a
 
 def data_process(batch_size=32, abawce = False):
 	
-    #csv_dir = Path('/home/wjh/ABAW5th/data_csv')
-    #img_dir = Path('')
+
 
     df_train = pd.read_csv('train.csv')
-    # df_train = df_train.drop(df_train[(df_train['lable'] == -1)|((df_train['lable'] == 7))].index)
-    # df_train = df_train.drop(df_train[(df_train['lable'] == -1)].index)
-
-    # df_train = df_train[:550]
-
-    # df_fake = pd.read_csv(csv_dir / 'fake.csv')
-    # df_fake = df_fake.drop(df_fake[(df_fake['lable'] == 0)|(df_fake['lable'] == 4)|(df_fake['lable'] == 5)].index)
-    # df_fake = df_fake.sample(frac=0.5)
-
-    # df_train = pd.concat([df_train, df_fake])
-    # df_train = df_train[:128]
-
-    # sample
-
-    # condition0 = df_train['lable'] == 0 
-    # subset0 = df_train[condition0].sample(frac=0.45)
-    # condition4 = df_train['lable'] == 4 
-    # subset4 = df_train[condition4].sample(frac=0.65)
-    # condition5 = df_train['lable'] == 5 
-    # subset5 = df_train[condition5].sample(frac=0.65)
-
-    # subset_other = df_train.drop(df_train[condition0|condition4|condition5].index)
-
-    # # | df_train['lable'] == 4 | df_train['lable'] == 5
-
-    # df_train = pd.concat([subset_other,subset5,subset4,subset0])
-    # print(df_train)
-
     df_valid = pd.read_csv('test.csv')
-    # df_valid = df_valid.drop(df_valid[(df_valid['lable'] == -1)|((df_valid['lable'] == 7))].index)
+
     df_valid = df_valid.sample(int(len(df_valid)/BATCHSIZE)*BATCHSIZE)
-    # df_valid = df_valid[:128]
-    
-    # df_train = pd.concat([df_train, df_valid])
+
 
     label_conuts = df_train['lable'].value_counts()
-    # print(label_conuts[3])
+
     print(label_conuts)
 
-    #train_set = dataload(df_train,'train',img_dir)
-    #valid_set = dataload(df_valid,'valid',img_dir) 
     train_set = dataload(df_train,'train')
     valid_set = dataload(df_valid,'valid')
 
@@ -386,17 +353,14 @@ class Focal_loss(nn.Module):
         self.gamma = gamma
         self.eps = 1e-8
     def forward(self, predict, target):
-        # print(predict)
-        # print(target)
+
         if self.weight!=None:
             weights = self.weight.unsqueeze(0).unsqueeze(1).repeat(predict.shape[0], predict.shape[2], 1)
         target_onehot = F.one_hot(target.long(), predict.shape[1]) 
         if self.weight!=None:
             weights = torch.sum(target_onehot * weights, -1)
         input_soft = F.softmax(predict, dim=1)
-        # print(input_soft.transpose(1, 0))
-        # print(input_soft.unsqueeze(0))
-        # print(target_onehot)
+
         probs = torch.sum(input_soft.transpose(2, 1) * target_onehot, -1).clamp(min=0.001, max=0.999)#此处一定要限制范围，否则会出现loss为Nan的现象。
         focal_weight = (1 + self.eps - probs) ** self.gamma
         if self.weight!=None:
@@ -458,7 +422,7 @@ def process(mlps, trainloader, testloader, label_conuts):
     for ep in range(EPOCHES):
         print("Epoch: {}/{}".format(ep + 1, EPOCHES))
         print("[INFO] Begin to train")
-        '''
+
         mlps_pred_train = [[] for i in range(len(mlps))]
         label_train=[]
         for img, label, _ in tqdm(trainloader):
@@ -505,9 +469,8 @@ def process(mlps, trainloader, testloader, label_conuts):
             writer.add_scalar('train_acc/'+str(idx),mlp_acc,ep)
             writer.add_scalar('train_f1/'+str(idx),mlp_f1,ep)
             print("模型" + str(idx) + "的acc=" + str(mlp_acc) + ", f1=" + str(mlp_f1) + ", loss=" + str(mlp_loss.item())) 
-        '''  
-        # for i, mlp in enumerate(mlps):
-        #     torch.save(mlp.state_dict(), '/home/wjh/ABAW5th/vote_model_state/model'+str(i)+'_202303151833.pth')
+
+
         pre = []
         mlps_pred_valid = [[] for i in range(len(mlps))]
         label_valid = []
@@ -530,10 +493,7 @@ def process(mlps, trainloader, testloader, label_conuts):
                 pre.clear()
                 
                 result = [Counter(arr[:, i]).most_common(1)[0][0] for i in range(BATCHSIZE)]
-                # for i_res in range(BATCHSIZE):
-                #     for j_res in [1,5,3,2]:
-                #         if j_res in arr[:, i_res]:
-                #             result[i_res] = j_res
+
                 vote_valid.extend(result)
     
         label_valid = torch.cat(label_valid)
@@ -542,13 +502,10 @@ def process(mlps, trainloader, testloader, label_conuts):
         writeresult(vote_valid,name)
         vote_acc = accuracy_score(vote_valid, label_valid)
         vote_f1 = f1_score(vote_valid, label_valid, average='macro')
-        # vote_loss = CE_loss_function(torch.from_numpy(vote_valid).unsqueeze(0).float(),torch.from_numpy(label_valid).unsqueeze(0).float()) + dice_loss_function(F.one_hot(torch.from_numpy(vote_valid),num_classes = numclass).float(),torch.from_numpy(label_valid))
-        # mlp_loss = CE_loss_function(torch.from_numpy(mlp_train_c).float().to(device),torch.from_numpy(label_train).to(device)) + dice_loss_function(torch.from_numpy(mlp_train_c).float(),torch.from_numpy(label_train))
-        
-        # vote_loss = CE_loss_function(torch.from_numpy(vote_valid).float(),torch.from_numpy(label_valid).float())
+    
         writer.add_scalar('vote_acc',vote_acc,ep)
         writer.add_scalar('vote_f1',vote_f1,ep)
-        # writer.add_scalar('vote_loss',vote_loss.item(),ep)
+
         if ep%20 == 0:
             plot_matrix(y_true=label_valid, y_pred=vote_valid, labels_name=[0,1,2,3,4,5,6], save_dir='output/vote-pic-{}.png'.format(ep + 1), title='vote-pic-{}.png'.format(ep + 1), thresh=0.8, axis_labels=['Happily Surprised', 'Sadly Fearful', 'Sadly Angry', 'Sadly Surprised', 'Fearfully Surprised', 'Angrily Surprised', 'Disgustedly Surprised'])
 
@@ -567,7 +524,7 @@ def process(mlps, trainloader, testloader, label_conuts):
             mlp_f1 = f1_score(mlp_valid, label_valid, average='macro')
             mlp_loss = CE_loss_function(torch.from_numpy(mlp_valid_c).float().to(device),torch.from_numpy(label_valid).to(device)) + dice_loss_function(torch.from_numpy(mlp_valid_c).float(),torch.from_numpy(label_valid))
             
-            # mlp_loss = CE_loss_function(torch.from_numpy(mlp_valid).float(),torch.from_numpy(label_valid).float()) 
+          
             if ep%20 == 0:
                 plot_matrix(y_true=label_valid, y_pred=mlp_valid, labels_name=[0,1,2,3,4,5,6], save_dir='output/valid-pic-{}-model-{}.png'.format(ep + 1, idx + 1), title='valid-pic-{}-model-{}.png'.format(ep + 1, idx + 1), thresh=0.8, axis_labels=['Happily Surprised', 'Sadly Fearful', 'Sadly Angry', 'Sadly Surprised', 'Fearfully Surprised', 'Angrily Surprised', 'Disgustedly Surprised'])
 
@@ -610,75 +567,16 @@ def predict_batch(mlps, df):
     return all_result
     
 
-
-# def predict(mlps, img_dir):
-
-# preprocess = transforms.Compose([
-#             transforms.Resize((224, 224)),
-#             transforms.ToTensor(),
-#             transforms.Normalize([0.367035294117647,0.41083294117647057,0.5066129411764705], (1, 1, 1))
-#             ])
-
-#     img = Image.open(img_dir)
-#     img = preprocess(img)
-#     img = img.unsqueeze(0)
-
-#     pre = []
-
-#     with torch.no_grad():
-#         img = img.to(device)
-#         for i, mlp in enumerate(mlps):
-#             mlp.eval()
-#             out = mlp(img)
-
-#             _, prediction = torch.max(out, 1)  # 按行取最大值
-#             pre_num = prediction.cpu().numpy()   
-#             pre.append(pre_num)
-#         arr = np.array(pre)
-#         pre.clear()
-                
-#         result = Counter(arr[:,0]).most_common(1)[0][0]
-#     return result
-
-def add_fake_label(mlps):
-    #img_dir = Path('/data03/cvpr23_competition/cvpr23_competition_data/cropped_aligned_images')
-
-    df_train = pd.read_csv('train.csv')
-    df_train = df_train.drop(df_train[(df_train['lable'] == 0)|((df_train['lable'] == 1))|((df_train['lable'] == 2))|((df_train['lable'] == 3))|((df_train['lable'] == 4))|((df_train['lable'] == 5))|((df_train['lable'] == 6))].index)
-    # df_train = df_train[:550]
-
-    df_valid = pd.read_csv('valid.csv')
-    df_valid = df_valid.drop(df_valid[(df_valid['lable'] == 0)|((df_valid['lable'] == 1))|((df_valid['lable'] == 2))|((df_valid['lable'] == 3))|((df_valid['lable'] == 4))|((df_valid['lable'] == 5))|((df_valid['lable'] == 6))].index)
-    # df_valid = df_valid[:550]
-
-    df_need_fake = pd.concat([df_train,df_valid])
-    dataframe = pd.DataFrame({'img_name':df_need_fake['img_name'],'lable':df_need_fake['lable']})
-    df_fake = dataframe[:940864]
-
-    img_labels = predict_batch(mlps, df_fake)
-
-    # for img_name in tqdm(df_need_fake['img_name']):
-    #     label = predict(mlps, img_dir / img_name)
-    #     img_labels.append(label)
-    #     img_names.append(img_name)
-
-    dataframe = pd.DataFrame({'img_name':df_fake['img_name'],'lable':img_labels})
-    dataframe.to_csv('fake.csv',index=False,sep=',')
-
-
-
 if __name__ == '__main__':
-    # mlps = [mbnet().to(device),  resnet152().to(device),  densenet121().to(device), resnet18().to(device), vggface().to(device),densenet201().to(device)]
+
     mlps = [mbnet().to(device),  resnet152().to(device),  densenet121().to(device), resnet18().to(device), densenet201().to(device)]
 
     for index, mlp in enumerate(mlps):
         state_saved = torch.load('vote_model_state/20240312BalCE/model'+str(index)+'.pth')
         mlp.load_state_dict(state_saved)
     
-    # label = predict(mlps, '/data03/cvpr23_competition/cvpr23_competition_data/cropped_aligned_images/cropped_aligned/6-30-1920x1080_left/00027.jpg')
-    # print(label)
+
     train_data, valid_data, label_conuts = data_process()
     process(mlps=mlps, trainloader=train_data , testloader=valid_data, label_conuts=label_conuts)
 
-    # add_fake_label(mlps)
 
