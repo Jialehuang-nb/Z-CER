@@ -39,20 +39,15 @@ def get_text_label(img_path):
     )
     return message.content[0].text
 
-# Specify the directory path
+
 directory = '/abaw-test/images_aligned'
 
-# Initialize an empty list to store the image paths
 image_list = []
 
-# Recursively iterate over the files in the directory and its subdirectories
 for root, dirs, files in os.walk(directory):
     for filename in files:
-        # Check if the file is an image file
         if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp')):
-            # Get the full path of the image file
             image_path = os.path.join(root, filename)
-            # Add the image path to the list
             image_list.append(image_path)
 
 error_images = []
