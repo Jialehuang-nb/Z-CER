@@ -4,7 +4,20 @@ This github repository holds the code for the USTC-AC team to participate in the
 # start
 `pip install -r requirements.txt`
 
-# train
+# Data process
+```
+video_root="./abaw-test/videos/"
+image_root="./abaw-test/images_raw/"
+save_root="./abaw-test/images_aligned/"
+```
+The first step is to change video_root, image_root, save_root in `Z-CER/data/preprocessing.py` to the path of the corresponding file.
+
+Then, run `python preprocessing.py`.
+
+Next, prepare a `train.csv` and a `test.csv` file in the root directory. The header of both files is [img_name,label], which corresponds to the full path and label of the image file in the RAF-DB dataset.
+
+
+# CNNs train
 `python vote.py`
 
 # predict
