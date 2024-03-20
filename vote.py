@@ -24,7 +24,7 @@ import numpy as np
 
 
 BATCHSIZE=64 # batchsize必须是testdata的整数倍
-EPOCHES=2
+EPOCHES=500
 LR=0.0001
 numclass = 7
 
