@@ -16,6 +16,10 @@ Then, run `python preprocessing.py`.
 
 Next, prepare a `train.csv` and a `test.csv` file in the root directory. The header of both files is [img_name,label], which corresponds to the full path and label of the image file in the RAF-DB dataset.
 
+# Visual language Model
+Run `python Visual_language_Model.py` several times until the error length becomes 0.
+
+Then, run `python Label_processing.py`
 
 # CNNs train
 `python vote.py`
