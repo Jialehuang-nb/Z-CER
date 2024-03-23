@@ -21,7 +21,7 @@ Run `python Visual_language_Model.py` several times until the error length becom
 
 Then, run `python Label_processing.py`
 
-Next, prepare a `abaw.csv` file in the root directory. The header of the file is [img_name,label], img_name means the frame id in the competition dataset, label means the fake label given by the model.
+Next, prepare a `abaw.csv` file in the root directory. The header of the file is [img_name,label]. Here, "img_name" means the frame id in the competition dataset, "label" means the fake label given by the model.
 # CNNs train
 `python vote.py`
 
