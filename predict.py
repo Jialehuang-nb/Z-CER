@@ -137,7 +137,6 @@ class dataload(Dataset):
     def __init__(self, df, dataset_name) -> None:
         super(dataload).__init__()
         self.df = df
-        self.abawce = abawce
 
         if dataset_name in ['train']:
             self.preprocess = transforms.Compose([
@@ -160,11 +159,9 @@ class dataload(Dataset):
         img_name = self.df['img_name'].iloc[index]
         name = os.path.basename(img_name)
         img_path = img_name[-7-len(name):]
-        if self.abawce:
             
-            p = -24-len(name)+5
-            
-            img_path = "data/images_aligned/"+img_name[p:]
+        p = -24-len(name)+5
+        img_path = "data/images_aligned/"+img_name[p:]
 
         X = Image.open(img_path)
         X = self.preprocess(X)
@@ -236,11 +233,8 @@ if __name__ == '__main__':
 
     for index, mlp in enumerate(mlps):
         print(index)
-        state_saved = torch.load('vote_model_state/'+str(index)+'.pth',map_location='cuda:0')
+        state_saved = torch.load('model/'+"model"+str(index)+'.pth',map_location='cuda:0')
         mlp.load_state_dict(state_saved)
 
     valid_data = data_process()
     process(mlps=mlps, testloader=valid_data)
-
-
-
