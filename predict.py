@@ -134,7 +134,7 @@ class dataload(Dataset):
     STD = [1, 1, 1] 
 
 
-    def __init__(self, df, dataset_name, abawce=False) -> None:
+    def __init__(self, df, dataset_name) -> None:
         super(dataload).__init__()
         self.df = df
         self.abawce = abawce
@@ -183,7 +183,7 @@ class dataload(Dataset):
 def data_process():
 	
     df_abaw = pd.read_csv('abaw.csv')
-    valid_set = dataload(df_abaw,'valid',True)
+    valid_set = dataload(df_abaw,'valid')
     batch_size = BATCHSIZE
     valid_data = DataLoader(valid_set, batch_size, shuffle=False, num_workers=8)
 
