@@ -25,7 +25,7 @@ from tqdm import tqdm
 
 #定义一些超参数
 #BATCHSIZE=32 # batchsize必须是testdata的整数倍
-BATCHSIZE=14
+BATCHSIZE=1
 #EPOCHES=500
 EPOCHES=1
 LR=0.001
